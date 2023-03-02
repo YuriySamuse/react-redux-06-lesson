@@ -1,5 +1,5 @@
 import { statusFilters } from './constants';
-import { combineReducers } from 'redux';
+import { addTask, deleteTask, toggleCompleted } from './actions';
 
 const tasksInitialState = [
   { id: 0, text: 'Learn HTML and CSS', completed: true },
@@ -9,58 +9,39 @@ const tasksInitialState = [
   { id: 4, text: 'Build amazing apps', completed: false },
 ];
 
-// Використовуємо initialState як значення стану за умовчанням
 export const tasksReducer = (state = tasksInitialState, action) => {
-  // Редюсер розрізняє екшени за значенням властивості type
   switch (action.type) {
-    // Залежно від типу екшену виконуватиметься різна логіка
-    case 'task/addTask': {
-      return {
-        ...state,
-        tasks: [...state.tasks, action.playoad],
-      };
-    }
-    case 'tasks/deleteTask':
-      return {
-        ...state,
-        tasks: state.tasks.filter(task => task.id !== action.playload),
-      };
-    case 'tasks/toggleCompleted':
-      return {
-        ...state,
-        tasks: state.tasks.map(task => {
-          if (task.id !== action.playload) {
-            return task;
-          }
-          return { ...task, completed: !task.completed };
-        }),
-      };
+    case addTask.type:
+      return [...state, action.payload];
+
+    case deleteTask.type:
+      return state.filter(task => task.id !== action.payload);
+
+    case toggleCompleted.type:
+      return state.map(task => {
+        if (task.id !== action.payload) {
+          return task;
+        }
+        return { ...task, completed: !task.completed };
+      });
 
     default:
-      // Кожен редюсер отримує всі екшени, відправлені в стор.
-      // Якщо редюсер не повинен обробляти якийсь тип екшену,
-      // необхідно повернути наявний стан без змін.
       return state;
   }
 };
 
-const filtersInitialSTate = {
+const filtersInitialState = {
   status: statusFilters.all,
 };
 
-const filtersReducer = (state = filtersInitialSTate, action) => {
+export const filtersReducer = (state = filtersInitialState, action) => {
   switch (action.type) {
     case 'filters/setStatusFilter':
       return {
         ...state,
-        status: action.playoad,
+        status: action.payload,
       };
     default:
       return state;
   }
 };
-
-export const rootReducer = combineReducers({
-  tasks: tasksReducer,
-  filters: filtersReducer,
-});
